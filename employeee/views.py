@@ -16,6 +16,7 @@ def get_employees(request):
         employees = employees.filter(name__icontains=name)
 
     if emp_id:
+        print("imside oif ")
         employees = employees.filter(employee_id=emp_id)
 
     serializer = EmployeeSerializer(employees, many=True)
