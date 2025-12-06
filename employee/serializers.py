@@ -11,6 +11,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'email', 'phone', 'address', 
             'department', 'designation', 'date_of_joining', 'is_active'
         ]
+        read_only_fields = ['id']
 
     def validate_employee_id(self, value):
         if "EMP" not in value.upper():

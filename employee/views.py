@@ -14,7 +14,6 @@ class EmployeeProfileView(APIView):
             employees = employees.filter(employee_id=emp_id)
         if dept:
             employees = employees.filter(department__icontains=dept)
-
         serializer = EmployeeSerializer(employees, many=True)
         return Response(serializer.data)
 
@@ -31,7 +30,7 @@ class EmployeeProfileView(APIView):
     def put(self, request):
         pk = request.data.get("id")
         if not pk:
-             return Response({"error": "ID is required for update"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "ID is required for update"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             employee = Employee.objects.get(id=pk)
         except Employee.DoesNotExist:
@@ -41,10 +40,11 @@ class EmployeeProfileView(APIView):
             serializer.save()
             return Response({"message": "Employee profile updated successfully"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request):
         pk = request.data.get("id")
         if not pk:
-             return Response({"error": "ID is required for deletion"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "ID is required for deletion"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             employee = Employee.objects.get(id=pk)
             employee.delete()
