@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     'library',
     'employee',
     'holiday',
+    'leaves',
+    'recruitment',
 ]
 
 # Middleware
