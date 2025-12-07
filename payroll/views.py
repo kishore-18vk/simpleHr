@@ -11,10 +11,10 @@ from .serializers import PayrollSerializer
 from employee.models import Employee  # Import for batch generation
 
 class PayrollViewSet(viewsets.ModelViewSet):
-    queryset = Payroll.objects.all().order_by('-pay_date')
+    queryset = Payroll.objects.select_related('employee').all().order_by('-pay_date')
     serializer_class = PayrollSerializer
 
-    # 1. Dashboard Stats (Total, Paid, Pending)
+    # 1. Dashboard Stats (Total, Paid, Pending) - INR Currency
     @action(detail=False, methods=['get'])
     def payroll_stats(self, request):
         total_payroll = Payroll.objects.aggregate(Sum('net_salary'))['net_salary__sum'] or 0
@@ -22,9 +22,9 @@ class PayrollViewSet(viewsets.ModelViewSet):
         pending_amount = Payroll.objects.filter(status='Pending').aggregate(Sum('net_salary'))['net_salary__sum'] or 0
 
         stats = [
-            {'label': 'Total Payroll', 'value': f"${total_payroll:,.2f}", 'color': '#6366f1', 'icon': 'dollar'},
-            {'label': 'Paid', 'value': f"${paid_amount:,.2f}", 'color': '#22c55e', 'icon': 'trending'},
-            {'label': 'Pending', 'value': f"${pending_amount:,.2f}", 'color': '#f59e0b', 'icon': 'calendar'},
+            {'label': 'Total Payroll', 'value': f"₹{total_payroll:,.2f}", 'color': '#6366f1', 'icon': 'dollar'},
+            {'label': 'Paid', 'value': f"₹{paid_amount:,.2f}", 'color': '#22c55e', 'icon': 'trending'},
+            {'label': 'Pending', 'value': f"₹{pending_amount:,.2f}", 'color': '#f59e0b', 'icon': 'calendar'},
         ]
         return Response(stats)
 
@@ -47,9 +47,9 @@ class PayrollViewSet(viewsets.ModelViewSet):
             if not exists:
                 Payroll.objects.create(
                     employee=emp, 
-                    basic_salary=emp.basic_salary or 5000, # Fallback if empty
-                    allowances=500, # Default (can be customized)
-                    deductions=200, # Default (can be customized)
+                    basic_salary=emp.basic_salary or 5000,
+                    allowances=500, 
+                    deductions=200, 
                     status='Pending'
                 )
                 created_count += 1
@@ -58,3 +58,35 @@ class PayrollViewSet(viewsets.ModelViewSet):
             return Response({'message': f'Successfully generated payroll for {created_count} employees.'})
         else:
             return Response({'message': 'Payroll for this month is up to date.'})
+
+    # 3. Mark payroll as Paid
+    @action(detail=True, methods=['post', 'patch'])
+    def mark_paid(self, request, pk=None):
+        try:
+            payroll = Payroll.objects.get(pk=pk)
+            payroll.status = 'Paid'
+            payroll.save()
+            return Response({'message': f'Payroll #{pk} marked as Paid.', 'status': 'Paid'})
+        except Payroll.DoesNotExist:
+            return Response({'error': 'Payroll not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # 4. Update basic salary for an employee
+    @action(detail=False, methods=['post'])
+    def update_salary(self, request):
+        employee_id = request.data.get('employee_id')  # e.g. "EMP006"
+        new_salary = request.data.get('basic_salary')
+
+        if not employee_id or not new_salary:
+            return Response({'error': 'employee_id and basic_salary are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            emp = Employee.objects.get(employee_id=employee_id)
+            emp.basic_salary = new_salary
+            emp.save()
+            return Response({
+                'message': f'Basic salary updated for {emp.first_name} {emp.last_name}',
+                'employee_id': employee_id,
+                'basic_salary': f'₹{new_salary}'
+            })
+        except Employee.DoesNotExist:
+            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)

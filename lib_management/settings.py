@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'attendance',
     'payroll',
     'onboarding',
+    'assets',
 ]
 
 # Middleware
