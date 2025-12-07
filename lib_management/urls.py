@@ -10,5 +10,6 @@ urlpatterns = [
     path('api/recruitment/', include('recruitment.urls')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/attendance/', include('attendance.urls')),
-    path('api/payroll/', include('payroll.urls')), # <--- MAKE SURE THIS IS HERE
+    path('api/payroll/', include('payroll.urls')), 
+    path('api/onboarding/', include('onboarding.urls')),
 ]
