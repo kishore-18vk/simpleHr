@@ -5,9 +5,11 @@ from django.utils import timezone
 from datetime import datetime
 from .models import Attendance
 from .serializers import AttendanceSerializer
+from employee.models import Employee
+
 
 class AttendanceViewSet(viewsets.ModelViewSet):
-    queryset = Attendance.objects.all().order_by('-date', 'employee_name')
+    queryset = Attendance.objects.select_related('employee').all().order_by('-date', 'employee__first_name')
     serializer_class = AttendanceSerializer
 
     def get_queryset(self):
@@ -18,9 +20,6 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(date=date_param)
         return queryset
 
-    # =========================================================
-    # API for the 4 Summary Cards (Present, Absent, etc.)
-    # =========================================================
     @action(detail=False, methods=['get'])
     def stats(self, request):
         # Get date or default to today

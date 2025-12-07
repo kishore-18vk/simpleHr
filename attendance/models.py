@@ -1,11 +1,7 @@
 from django.db import models
 from datetime import date, datetime, timedelta
+from employee.models import Employee
 
-# Import Employee model if available, else use CharField
-try:
-    from employee.models import Employee
-except ImportError:
-    Employee = None
 
 class Attendance(models.Model):
     STATUS_CHOICES = [
@@ -14,14 +10,11 @@ class Attendance(models.Model):
         ('On Leave', 'On Leave'),
         ('Late', 'Late'),
         ('Half Day', 'Half Day'),
-        ('Working', 'Working'), # For currently active sessions
+        ('Working', 'Working'),
     ]
 
-    # If you have an Employee model, use ForeignKey
-    # employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    # For now, using name/id directly to match your request
-    employee_name = models.CharField(max_length=100)
-    employee_id = models.CharField(max_length=20) # e.g. EMP001
+    # ForeignKey to Employee model
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
     
     date = models.DateField(default=date.today)
     check_in = models.TimeField(null=True, blank=True)
@@ -60,4 +53,4 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.employee_name} - {self.date}"
+        return f"{self.employee.first_name} {self.employee.last_name} - {self.date}"
