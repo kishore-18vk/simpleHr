@@ -22,6 +22,9 @@ INSTALLED_APPS = [
     'holiday',
     'leaves',
     'recruitment',
+    'dashboard',
+    'attendance',
+    'payroll',
 ]
 
 # Middleware
