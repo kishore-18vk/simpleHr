@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'payroll',
     'onboarding',
     'assets',
+    'settings_app',
 ]
 
 # Middleware
