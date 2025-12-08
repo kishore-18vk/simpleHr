@@ -1,22 +1,31 @@
 import os
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = '1htka**s9t)1+_22+@fbc(@%xo^puxssn_cmsgupu!9%b3-rjs'
-DEBUG = True
-ALLOWED_HOSTS = []
+# SECURITY KEY
+SECRET_KEY = os.environ.get("SECRET_KEY", "1htka**s9t)1+_22+@fbc(@%xo^puxssn_cmsgupu!9%b3-rjs")
+
+# Debug mode (ON for local, OFF on server)
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+# Allowed Hosts
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 # Installed apps
 INSTALLED_APPS = [
-    'corsheaders',  # <-- Added for CORS
+    'corsheaders', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+
+    # Your Apps
     'library',
     'employee',
     'holiday',
@@ -32,7 +41,7 @@ INSTALLED_APPS = [
 
 # Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # <-- Must be first
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,17 +71,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lib_management.wsgi.application'
 
+# DATABASE (MySQL using environment variables)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'library_db',
-        'USER': 'django_user',
-        'PASSWORD': 'Kishore@18',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.environ.get("DB_NAME", "library_db"),
+        'USER': os.environ.get("DB_USER", "django_user"),
+        'PASSWORD': os.environ.get("DB_PASSWORD", "Kishore@18"),
+        'HOST': os.environ.get("DB_HOST", "localhost"),
+        'PORT': os.environ.get("DB_PORT", "3306"),
     }
 }
 
+# Password Validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -80,31 +91,33 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Language & Timezone
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Static Files for Deployment
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # REQUIRED FOR RENDER
 
+# Authentication Redirects
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-# Django REST Framework & JWT
+# Django REST + JWT
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 
-# CORS settings
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
-CORS_ALLOW_ALL_ORIGINS = True
-
-ALLOWED_HOSTS = ['*']
 
