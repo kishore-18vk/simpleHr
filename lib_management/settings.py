@@ -1,20 +1,24 @@
 import os
 from pathlib import Path
+import dj_database_url  # Needed for Render database
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY KEY
+# Using a default for local dev, but Render will use the env var if set
 SECRET_KEY = os.environ.get("SECRET_KEY", "1htka**s9t)1+_22+@fbc(@%xo^puxssn_cmsgupu!9%b3-rjs")
 
-# Debug mode (ON for local, OFF on server)
+# Debug mode (False on Render if you set the env var, True locally)
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # Allowed Hosts
+# On Render, this will allow the app URL. Locally it allows localhost.
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+
 
 # Installed apps
 INSTALLED_APPS = [
-    'corsheaders', 
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -25,7 +29,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
 
-    # Your Apps
+    # Your apps
     'library',
     'employee',
     'holiday',
@@ -43,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- ADDED: Critical for static files on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,19 +76,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lib_management.wsgi.application'
 
-# DATABASE (MySQL using environment variables)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get("DB_NAME", "library_db"),
-        'USER': os.environ.get("DB_USER", "django_user"),
-        'PASSWORD': os.environ.get("DB_PASSWORD", "Kishore@18"),
-        'HOST': os.environ.get("DB_HOST", "localhost"),
-        'PORT': os.environ.get("DB_PORT", "3306"),
+# DATABASE SETTINGS
+# Logic: If 'DATABASE_URL' exists (Render), use it. Otherwise use local MySQL.
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get("DB_NAME", "library_db"),
+            'USER': os.environ.get("DB_USER", "django_user"),
+            'PASSWORD': os.environ.get("DB_PASSWORD", "Kishore@18"),
+            'HOST': os.environ.get("DB_HOST", "localhost"),
+            'PORT': os.environ.get("DB_PORT", "3306"),
+        }
+    }
 
-# Password Validators
+# Password Validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -91,33 +102,30 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Language & Timezone
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static Files for Deployment
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # REQUIRED FOR RENDER
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Authentication Redirects
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+# ADDED: This allows Render to serve your static files efficiently
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Django REST + JWT
+# JWT Authentication
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ]
 }
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True  # Useful for testing, but careful in production
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://vortex18.netlify.app/login"
 ]
-
