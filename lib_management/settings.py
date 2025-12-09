@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dj_database_url  # Needed for Render database
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -120,6 +121,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # <--- This sets it to 1 Hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 # CORS
