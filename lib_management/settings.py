@@ -127,5 +127,5 @@ CORS_ALLOW_ALL_ORIGINS = True  # Useful for testing, but careful in production
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://vortex18.netlify.app/login"
+    "https://vortex18.netlify.app"
 ]
