@@ -11,15 +11,15 @@ class LeaveRequestView(APIView):
     def get(self, request):
         status_filter = request.query_params.get('status')
         emp_id = request.query_params.get('employee_id')
-        
-        # Order by newest first
-        leaves = LeaveRequest.objects.all().order_by('-created_at')
-        
+
+        # Order by newest first, use select_related for optimization
+        leaves = LeaveRequest.objects.select_related('employee').all().order_by('-created_at')
+
         if status_filter and status_filter != 'All':
             leaves = leaves.filter(status=status_filter)
         if emp_id:
-            leaves = leaves.filter(employee_id=emp_id)
-            
+            leaves = leaves.filter(employee__employee_id=emp_id)
+
         serializer = LeaveRequestSerializer(leaves, many=True)
         return Response(serializer.data)
 
