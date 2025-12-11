@@ -1,0 +1,301 @@
+{
+  "info": {
+    "name": "HRMS API Collection",
+    "description": "Complete API collection for HRMS system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"adminpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["login", ""]
+            }
+          }
+        },
+        {
+          "name": "Employee Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employee/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["employee", "login", ""]
+            }
+          }
+        },
+        {
+          "name": "Register Employee (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"employee_id\": \"EMP002\",\n  \"username\": \"johndoe\",\n  \"email\": \"john@company.com\",\n  \"phone\": \"1234567890\",\n  \"gender\": \"Male\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Developer\",\n  \"date_of_joining\": \"2025-01-01\",\n  \"role\": \"employee\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employee/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["employee", "register", ""]
+            }
+          }
+        },
+        {
+          "name": "Set Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"YOUR_INVITATION_TOKEN\",\n  \"password\": \"SecurePass123!\",\n  \"password_confirm\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employee/set-password/",
+              "host": ["{{baseUrl}}"],
+              "path": ["employee", "set-password", ""]
+            }
+          }
+        },
+        {
+          "name": "My Profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employee/me/",
+              "host": ["{{baseUrl}}"],
+              "path": ["employee", "me", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Check-In",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/check-in/",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "check-in", ""]
+            }
+          }
+        },
+        {
+          "name": "Check-Out",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/check-out/",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "check-out", ""]
+            }
+          }
+        },
+        {
+          "name": "Today's Attendance",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/attendance/today/EMP001/",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "today", "EMP001", ""]
+            }
+          }
+        },
+        {
+          "name": "Monthly Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/attendance/report/?month=2025-12",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "report", ""],
+              "query": [
+                { "key": "month", "value": "2025-12" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Attendance Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/attendance/stats/",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "stats", ""]
+            }
+          }
+        },
+        {
+          "name": "Auto Absent",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/attendance/auto-absent/",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "auto-absent", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payroll",
+      "item": [
+        {
+          "name": "Set Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payroll_id\": 1,\n  \"status\": \"Paid\",\n  \"notes\": \"December salary processed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payroll/set-status/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "set-status", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Payroll",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/employee/EMP001/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "employee", "EMP001", ""]
+            }
+          }
+        },
+        {
+          "name": "Get All Payroll",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/all/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "all", ""]
+            }
+          }
+        },
+        {
+          "name": "Run Payroll",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/run_payroll/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "run_payroll", ""]
+            }
+          }
+        },
+        {
+          "name": "Payroll Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/payroll_stats/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "payroll_stats", ""]
+            }
+          }
+        },
+        {
+          "name": "Status Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/logs/",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "logs", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats/",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
